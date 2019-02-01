@@ -1998,6 +1998,43 @@ module DocusignRest
       (parsed_response || {}).fetch("users", [])
     end
 
+    # Public method - Retrieves the account settings information for the specified account.
+    # See https://developers.docusign.com/esign-rest-api/reference/Accounts/Accounts/listSettings 
+    #
+    # Returns a list of account settings
+    def get_account_settings(options = {})
+      content_type = { 'Content-Type' => 'application/json' }
+      content_type.merge(options[:headers]) if options[:headers]
+      uri = build_uri("/accounts/#{acct_id}/settings")
+
+      http = initialize_net_http_ssl(uri)
+      request = Net::HTTP::Get.new(uri.request_uri, headers(content_type))
+      response = http.request(request)
+      generate_log(request, response, uri)
+      JSON.parse(response.body)
+    end
+
+    # Public method - Updates the account settings for the specified account.
+    # See https://developers.docusign.com/esign-rest-api/reference/Accounts/Accounts/updateSettings
+    #
+    # Returns the response (success or failure).
+    def update_account_settings(options={})
+      content_type = { 'Content-Type' => 'application/json' }
+
+      account_settings = options[:account_settings] || []
+      post_body = {
+        accountSettings: account_settings
+      }.to_json
+
+      uri = build_uri("/accounts/#{@acct_id}/settings")
+      http = initialize_net_http_ssl(uri)
+      request = Net::HTTP::Put.new(uri.request_uri, headers(content_type))
+      request.body = post_body
+      response = http.request(request)
+      generate_log(request, response, uri)
+      response
+    end
+
     private
 
     # Private: Generates a standardized log of the request and response pair
