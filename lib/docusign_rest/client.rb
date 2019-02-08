@@ -629,11 +629,12 @@ module DocusignRest
     # documentId
     #
     # Returns a hash of documents that are to be uploaded
-    def get_documents(ios)
+    def get_documents(ios, transform_pdf_fields=false)
       ios.each_with_index.map do |io, index|
         {
           documentId: "#{index + 1}",
-          name: io.original_filename
+          name: io.original_filename,
+          transformPdfFields: transform_pdf_fields || false
         }
       end
     end
@@ -786,7 +787,7 @@ module DocusignRest
         emailBlurb:   "#{options[:email][:body] if options[:email]}",
         emailSubject: "#{options[:email][:subject] if options[:email]}",
         emailSettings: get_email_settings(options[:email_settings]),
-        documents: get_documents(ios),
+        documents: get_documents(ios, options[:transform_pdf_fields]),
         recipients: {
           signers: get_signers(options[:signers]),
           carbonCopies: get_carbon_copies(options[:carbon_copies],options[:signers].size)
