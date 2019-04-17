@@ -847,7 +847,7 @@ module DocusignRest
       post_body = {
         emailBlurb: "#{options[:email][:body] if options[:email]}",
         emailSubject: "#{options[:email][:subject] if options[:email]}",
-        documents: get_documents(ios),
+        documents: get_documents(ios, options[:transform_pdf_fields]),
         recipients: {
           signers: get_signers(options[:signers], template: true)
         },
@@ -1969,7 +1969,8 @@ module DocusignRest
       uri = build_uri("/accounts/#{@acct_id}/envelopes/#{options[:envelope_id]}/recipients?resend_envelope=true")
 
       post_body = {
-        signers: get_signers(options[:signers])
+        signers: get_signers(options[:signers]),
+        carbonCopies: get_carbon_copies(options[:carbon_copies],options[:signers].size)
       }.to_json
 
       http = initialize_net_http_ssl(uri)
